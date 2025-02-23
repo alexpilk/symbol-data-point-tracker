@@ -4,6 +4,7 @@ from collections import defaultdict
 class RollingStats:
     def __init__(self):
         self.sum = 0
+        self.sum_of_squares = 0
 
 
 def stat_map_factory(max_k):
@@ -31,17 +32,21 @@ class Tracker:
             window_size = 10 ** k
 
             from_ = -1 * min(window_size, new_points)
-            self.rolling_stats[symbol][k].sum += sum(values[from_:])
+            for value in values[from_:]:
+                self.rolling_stats[symbol][k].sum += value
+                self.rolling_stats[symbol][k].sum_of_squares += value ** 2
 
             from_ = -1 * (new_points + window_size)
             to = -1 * max(new_points, window_size)
-            self.rolling_stats[symbol][k].sum -= sum(self.symbols[symbol][from_:to])
+            for value in self.symbols[symbol][from_:to]:
+                self.rolling_stats[symbol][k].sum -= value
+                self.rolling_stats[symbol][k].sum_of_squares -= value ** 2
 
     def get_stats(self, symbol, k):
         values = self.symbols[symbol][-1 * 10 ** k:]
         avg = self.rolling_stats[symbol][k].sum / len(values)
 
-        variance = sum([(point - avg) ** 2 for point in values]) / len(values)
+        variance = self.rolling_stats[symbol][k].sum_of_squares / len(values) - avg ** 2
         return {
             'min': min(values),
             'max': max(values),
@@ -49,10 +54,6 @@ class Tracker:
             'var': variance,
             'last': values[-1]
         }
-
-    def reset(self):
-        self.symbols = defaultdict(list)
-        self.rolling_stats = defaultdict(lambda: stat_map_factory(self.MAX_K))
 
 
 def get_tracker():
