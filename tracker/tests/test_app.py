@@ -41,7 +41,7 @@ def test_cannot_add_oversized_batch(client):
     }
 
 
-def test_get_stats(nvda_3_points, client):
+def test_get_stats(nvda_3_points, nvda_3_points_expected_stats, client):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -49,15 +49,28 @@ def test_get_stats(nvda_3_points, client):
         }
     )
     assert response.status_code == 200
-    assert response.json() == {
-        'data': {
-            'min': 1.5,
-            'max': 4.0,
-            'last': 4.0,
-            'avg': 2.5,
-            'var': pytest.approx(1.16666667)
+    assert response.json() == nvda_3_points_expected_stats
+
+
+def test_get_stats_for_multiple_symbols(nvda_3_points, nvda_3_points_expected_stats, intl_5_points,
+                                        intl_5_points_expected_stats, client):
+    response = client.get(
+        '/stats', params={
+            'symbol': 'NVDA',
+            'k': 2
         }
-    }
+    )
+    assert response.status_code == 200
+    assert response.json() == nvda_3_points_expected_stats
+
+    response = client.get(
+        '/stats', params={
+            'symbol': 'INTL',
+            'k': 2
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == intl_5_points_expected_stats
 
 
 @pytest.mark.parametrize('k', [-1, 0])
