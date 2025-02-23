@@ -81,7 +81,7 @@ def test_get_stats(nvda_3_points):
 
 
 @pytest.mark.parametrize('k', [-1, 0])
-def test_get_stats_fails_with_k_too_small(k):
+def test_get_stats_fails_with_k_too_small(k, nvda_3_points):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -102,7 +102,8 @@ def test_get_stats_fails_with_k_too_small(k):
         ]
     }
 
-def test_get_stats_fails_with_k_too_large():
+
+def test_get_stats_fails_with_k_too_large(nvda_3_points):
     k = 9
     response = client.get(
         '/stats', params={
@@ -121,5 +122,28 @@ def test_get_stats_fails_with_k_too_large():
                 'ctx': {
                     'le': 8
                 }}
+        ]
+    }
+
+
+def test_get_invalid_symbol():
+    response = client.get(
+        '/stats', params={
+            'symbol': 'NVDA',
+            'k': 2
+        }
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [
+            {
+                'type': 'value_error',
+                'loc': ['query', 'symbol'],
+                'msg': 'Value error, Symbol "NVDA" does not exist',
+                'input': 'NVDA',
+                'ctx': {
+                    'error': {}
+                }
+            }
         ]
     }
