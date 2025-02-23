@@ -78,3 +78,48 @@ def test_get_stats(nvda_3_points):
             'var': pytest.approx(1.16666667)
         }
     }
+
+
+@pytest.mark.parametrize('k', [-1, 0])
+def test_get_stats_fails_with_k_too_small(k):
+    response = client.get(
+        '/stats', params={
+            'symbol': 'NVDA',
+            'k': k
+        }
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [
+            {
+                'type': 'greater_than_equal',
+                'loc': ['query', 'k'],
+                'msg': 'Input should be greater than or equal to 1',
+                'input': f'{k}',
+                'ctx': {
+                    'ge': 1
+                }}
+        ]
+    }
+
+def test_get_stats_fails_with_k_too_large():
+    k = 9
+    response = client.get(
+        '/stats', params={
+            'symbol': 'NVDA',
+            'k': k
+        }
+    )
+    assert response.status_code == 422
+    assert response.json() == {
+        'detail': [
+            {
+                'type': 'less_than_equal',
+                'loc': ['query', 'k'],
+                'msg': 'Input should be less than or equal to 8',
+                'input': f'{k}',
+                'ctx': {
+                    'le': 8
+                }}
+        ]
+    }

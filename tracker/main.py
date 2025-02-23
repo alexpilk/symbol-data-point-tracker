@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import FastAPI, Request, Query
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, conlist
+from pydantic import BaseModel, conlist, conint
 
 
 class Tracker:
@@ -40,7 +40,7 @@ class Batch(BaseModel):
 
 class StatsParams(BaseModel):
     symbol: str
-    k: int
+    k: conint(ge=1, le=8)
 
 
 app = FastAPI()
