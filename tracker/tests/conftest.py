@@ -65,22 +65,63 @@ def intl_5_points_expected_stats():
 
 
 @pytest.fixture
-def nvda_1e8_points(fresh_tracker):
+def nvda_1e6_points(client, fresh_tracker):
     random.seed(0)
-    fresh_tracker.add(
-        'NVDA',
-        values=[random.random() * 10 ** 4 for _ in range(10 ** 8)]
-    )
+
+    values_count = 10 ** 6
+    values = [random.random() * 10 ** 4 for _ in range(values_count)]
+
+    values_sent = 0
+    while values_sent < values_count:
+        batch_size = random.randint(9000, 10000)
+        client.post(
+            '/add_batch', json={
+                'symbol': 'NVDA',
+                'values': values[values_sent:min(values_sent + batch_size, values_count)]
+            }
+        )
+        values_sent += batch_size
 
 
 @pytest.fixture
-def nvda_1e7_points_expected_stats():
+def nvda_expected_stats():
     return {
-        'data': {
-            'min': pytest.approx(0.0003373892532021472),
-            'max': pytest.approx(9999.999134910702),
-            'avg': pytest.approx(4999.9053275969645),
-            'var': pytest.approx(8337202.862058624),
-            'last': pytest.approx(5953.1932285127195)
+        1: {
+            'min': pytest.approx(128.0595981043786),
+            'max': pytest.approx(8421.4346067016),
+            'avg': pytest.approx(4522.069022831475),
+            'var': pytest.approx(5548730.8684007805),
+            'last': pytest.approx(3946.9582187920137)},
+        2: {
+            'min': pytest.approx(128.0595981043786),
+            'max': pytest.approx(9896.52164356374),
+            'avg': pytest.approx(4766.153735307077),
+            'var': pytest.approx(7276093.494312557),
+            'last': pytest.approx(3946.9582187920137)},
+        3: {
+            'min': pytest.approx(28.052760429577717),
+            'max': pytest.approx(9989.009495176113),
+            'avg': pytest.approx(4961.698472275404),
+            'var': pytest.approx(8550312.610626455),
+            'last': pytest.approx(3946.9582187920137)},
+        4: {
+            'min': pytest.approx(0.061166487218544674),
+            'max': pytest.approx(9999.845655419565),
+            'avg': pytest.approx(4980.800195881944),
+            'var': pytest.approx(8332120.012060966),
+            'last': pytest.approx(3946.9582187920137)},
+        5: {
+            'min': pytest.approx(0.0006078215908367213),
+            'max': pytest.approx(9999.972972861955),
+            'avg': pytest.approx(4978.878719523702),
+            'var': pytest.approx(8360747.8421358215),
+            'last': pytest.approx(3946.9582187920137)
+        },
+        6: {
+            'min': pytest.approx(0.0006078215908367213),
+            'max': pytest.approx(9999.983960441965),
+            'avg': pytest.approx(4996.782627196542),
+            'var': pytest.approx(8334203.194891368),
+            'last': pytest.approx(3946.9582187920137)
         }
     }
