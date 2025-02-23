@@ -1,15 +1,17 @@
 import pytest
+from fastapi.testclient import TestClient
 
 from tracker.api import tracker
+from tracker.service import Tracker
 
 
 @pytest.fixture(autouse=True)
-def fresh_tracker():
+def fresh_tracker() -> Tracker:
     tracker.reset()
     return tracker
 
 
-def test_add_batch(client):
+def test_add_batch(client: TestClient):
     response = client.post(
         '/add_batch', json={
             'symbol': 'NVDA',
@@ -25,7 +27,7 @@ def test_add_batch(client):
     }
 
 
-def test_cannot_add_oversized_batch(client):
+def test_cannot_add_oversized_batch(client: TestClient):
     response = client.post(
         '/add_batch', json={
             'symbol': 'NVDA',
@@ -49,7 +51,7 @@ def test_cannot_add_oversized_batch(client):
     }
 
 
-def test_get_stats(nvda_3_points, nvda_3_points_expected_stats, client):
+def test_get_stats(nvda_3_points: None, nvda_3_points_expected_stats: dict[str, dict], client: TestClient):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -60,8 +62,11 @@ def test_get_stats(nvda_3_points, nvda_3_points_expected_stats, client):
     assert response.json() == nvda_3_points_expected_stats
 
 
-def test_get_stats_for_multiple_symbols(nvda_3_points, nvda_3_points_expected_stats, intl_5_points,
-                                        intl_5_points_expected_stats, client):
+def test_get_stats_for_multiple_symbols(nvda_3_points: None,
+                                        nvda_3_points_expected_stats: dict[str, dict],
+                                        intl_5_points: None,
+                                        intl_5_points_expected_stats: dict[str, dict],
+                                        client: TestClient):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -82,7 +87,7 @@ def test_get_stats_for_multiple_symbols(nvda_3_points, nvda_3_points_expected_st
 
 
 @pytest.mark.parametrize('k', [-1, 0])
-def test_get_stats_fails_with_k_too_small(k, nvda_3_points, client):
+def test_get_stats_fails_with_k_too_small(k: int, nvda_3_points: None, client: TestClient):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -104,7 +109,7 @@ def test_get_stats_fails_with_k_too_small(k, nvda_3_points, client):
     }
 
 
-def test_get_stats_fails_with_k_too_large(nvda_3_points, client):
+def test_get_stats_fails_with_k_too_large(nvda_3_points: None, client: TestClient):
     k = 9
     response = client.get(
         '/stats', params={
@@ -127,7 +132,7 @@ def test_get_stats_fails_with_k_too_large(nvda_3_points, client):
     }
 
 
-def test_get_invalid_symbol(client):
+def test_get_invalid_symbol(client: TestClient):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',

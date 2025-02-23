@@ -1,8 +1,9 @@
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.mark.parametrize('k', range(1, 7))
-def test_get_stats_for_k(k, nvda_1e6_points, nvda_expected_stats, client):
+def test_get_stats_for_k(k: int, nvda_1e6_points: None, nvda_expected_stats: dict[int, dict], client: TestClient):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
