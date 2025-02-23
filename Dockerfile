@@ -14,4 +14,4 @@ WORKDIR ./app
 RUN uv sync --frozen
 
 # Presuming there is a `my_app` command provided by the project
-CMD ["fastapi", "run", "tracker/main.py", "--port", "80", "--host", "0.0.0.0"]
+CMD ["fastapi", "run", "tracker/api", "--port", "80", "--host", "0.0.0.0"]
