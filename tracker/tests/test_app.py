@@ -1,5 +1,13 @@
 import pytest
 
+from tracker.api import tracker
+
+
+@pytest.fixture(autouse=True)
+def fresh_tracker():
+    tracker.reset()
+    return tracker
+
 
 def test_add_batch(client):
     response = client.post(

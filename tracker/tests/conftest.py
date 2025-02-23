@@ -11,12 +11,6 @@ def client():
     return TestClient(app)
 
 
-@pytest.fixture(autouse=True)
-def fresh_tracker():
-    tracker.reset()
-    return tracker
-
-
 @pytest.fixture
 def nvda_3_points(client):
     client.post(
@@ -63,8 +57,9 @@ def intl_5_points_expected_stats():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def nvda_1e6_points(client):
+    tracker.reset()
     random.seed(0)
 
     values_count = 10 ** 6
