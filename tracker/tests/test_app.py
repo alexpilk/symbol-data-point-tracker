@@ -1,9 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from tracker.main import app
+from tracker.main import app, tracker
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def fresh_tracker():
+    tracker.reset()
 
 
 @pytest.fixture
