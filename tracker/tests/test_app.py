@@ -1,27 +1,7 @@
 import pytest
-from fastapi.testclient import TestClient
-
-from tracker.main import app, tracker
-
-client = TestClient(app)
 
 
-@pytest.fixture(autouse=True)
-def fresh_tracker():
-    tracker.reset()
-
-
-@pytest.fixture
-def nvda_3_points():
-    client.post(
-        '/add_batch', json={
-            'symbol': 'NVDA',
-            'values': [1.5, 2.0, 4.0]
-        }
-    )
-
-
-def test_add_batch():
+def test_add_batch(client):
     response = client.post(
         '/add_batch', json={
             'symbol': 'NVDA',
@@ -37,7 +17,7 @@ def test_add_batch():
     }
 
 
-def test_cannot_add_oversized_batch():
+def test_cannot_add_oversized_batch(client):
     response = client.post(
         '/add_batch', json={
             'symbol': 'NVDA',
@@ -61,7 +41,7 @@ def test_cannot_add_oversized_batch():
     }
 
 
-def test_get_stats(nvda_3_points):
+def test_get_stats(nvda_3_points, client):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -81,7 +61,7 @@ def test_get_stats(nvda_3_points):
 
 
 @pytest.mark.parametrize('k', [-1, 0])
-def test_get_stats_fails_with_k_too_small(k, nvda_3_points):
+def test_get_stats_fails_with_k_too_small(k, nvda_3_points, client):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
@@ -103,7 +83,7 @@ def test_get_stats_fails_with_k_too_small(k, nvda_3_points):
     }
 
 
-def test_get_stats_fails_with_k_too_large(nvda_3_points):
+def test_get_stats_fails_with_k_too_large(nvda_3_points, client):
     k = 9
     response = client.get(
         '/stats', params={
@@ -126,7 +106,7 @@ def test_get_stats_fails_with_k_too_large(nvda_3_points):
     }
 
 
-def test_get_invalid_symbol():
+def test_get_invalid_symbol(client):
     response = client.get(
         '/stats', params={
             'symbol': 'NVDA',
