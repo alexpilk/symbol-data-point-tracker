@@ -1,6 +1,6 @@
 from pydantic import BaseModel, conlist, conint, field_validator
 
-from tracker.service import tracker
+from tracker.api.app import tracker
 
 
 class Batch(BaseModel):

@@ -3,11 +3,10 @@ import random
 import pytest
 from fastapi.testclient import TestClient
 
-from tracker.api import app
-from tracker.service import tracker
+from tracker.api import app, tracker
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def client():
     return TestClient(app)
 
@@ -65,7 +64,7 @@ def intl_5_points_expected_stats():
 
 
 @pytest.fixture
-def nvda_1e6_points(client, fresh_tracker):
+def nvda_1e6_points(client):
     random.seed(0)
 
     values_count = 10 ** 6

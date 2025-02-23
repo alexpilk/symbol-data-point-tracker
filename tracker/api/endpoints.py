@@ -4,8 +4,7 @@ from fastapi import Request, Query
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
 
-from tracker.service import tracker
-from .app import app
+from .app import app, tracker
 from .models import Batch, StatsParams
 
 
