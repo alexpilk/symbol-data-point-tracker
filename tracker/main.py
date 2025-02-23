@@ -4,7 +4,11 @@ from typing import Annotated
 from fastapi import FastAPI, Request, Query
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, conlist, conint
+from pydantic import BaseModel, conlist, conint, field_validator
+
+
+class InvalidSymbol(Exception):
+    pass
 
 
 class Tracker:
@@ -41,6 +45,13 @@ class Batch(BaseModel):
 class StatsParams(BaseModel):
     symbol: str
     k: conint(ge=1, le=8)
+
+    @field_validator('symbol')
+    @classmethod
+    def ensure_symbol_exists(cls, symbol: str):
+        if symbol not in tracker.symbols:
+            raise ValueError(f'Symbol "{symbol}" does not exist')
+        return symbol
 
 
 app = FastAPI()
