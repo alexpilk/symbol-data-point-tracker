@@ -50,10 +50,6 @@ class Tracker:
             'last': values[-1]
         }
 
-    def reset(self):
-        self.symbols = defaultdict(list)
-        self.rolling_stats = defaultdict(lambda: stat_map_factory(self.MAX_K))
-
 
 def get_tracker():
     return Tracker()
