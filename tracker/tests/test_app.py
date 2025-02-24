@@ -132,6 +132,32 @@ def test_get_stats_fails_with_k_too_large(nvda_3_points: None, client: TestClien
     }
 
 
+def test_get_stats_uses_last_1ek_data_points(client: TestClient):
+    client.post(
+        '/add_batch', json={
+            'symbol': 'NVDA',
+            'values': [1.0] * 5 + [2.0] * 5 + [3.0] * 5 + [4.0] * 5
+        }
+    )
+
+    response = client.get(
+        '/stats', params={
+            'symbol': 'NVDA',
+            'k': 1
+        }
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        'data': {
+            'min': 3.0,
+            'max': 4.0,
+            'last': 4.0,
+            'avg': 3.5,
+            'var': 0.25
+        }
+    }
+
+
 def test_get_invalid_symbol(client: TestClient):
     response = client.get(
         '/stats', params={
